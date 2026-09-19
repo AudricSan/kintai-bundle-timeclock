@@ -1,0 +1,17 @@
+{
+    "bundle_timeclock": "打刻",
+    "bundle_timeclock_desc": "従業員の出退勤打刻、履歴、管理者による打刻記録の管理。",
+    "clock_in_success": "出勤打刻を記録しました。",
+    "clock_out_success": "退勤打刻を記録しました。",
+    "clocked_out": "退勤済",
+    "confirm_delete_timeclock": "この打刻を削除しますか？",
+    "edit_timeclock": "打刻を編集",
+    "leave_empty_if_active": "進行中の場合は空欄のまま",
+    "no_timeclock_entries": "打刻記録がありません。",
+    "this_week": "今週",
+    "timeclock_active": "進行中",
+    "timeclock_already_active": "すでに出勤中です。新しく出勤する前に退勤打刻をしてください。",
+    "timeclock_deleted": "打刻を削除しました。",
+    "timeclock_edited": "打刻を更新しました。",
+    "timeclock_no_active": "終了できる出勤中の記録がありません。"
+}

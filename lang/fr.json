@@ -1,0 +1,17 @@
+{
+    "bundle_timeclock": "Pointage",
+    "bundle_timeclock_desc": "Pointer/dépointer côté employé, historique et gestion admin des entrées de pointage.",
+    "clock_in_success": "Arrivée enregistrée.",
+    "clock_out_success": "Départ enregistré.",
+    "clocked_out": "Terminé",
+    "confirm_delete_timeclock": "Supprimer cette entrée de pointage ?",
+    "edit_timeclock": "Modifier le pointage",
+    "leave_empty_if_active": "laisser vide si en cours",
+    "no_timeclock_entries": "Aucun pointage trouvé.",
+    "this_week": "Cette semaine",
+    "timeclock_active": "En cours",
+    "timeclock_already_active": "Un pointage est déjà en cours — pensez à pointer votre départ avant d'en démarrer un nouveau.",
+    "timeclock_deleted": "Pointage supprimé.",
+    "timeclock_edited": "Pointage modifié.",
+    "timeclock_no_active": "Aucun pointage en cours à clôturer."
+}

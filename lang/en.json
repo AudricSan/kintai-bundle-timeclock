@@ -1,0 +1,17 @@
+{
+    "bundle_timeclock": "Timeclock",
+    "bundle_timeclock_desc": "Employee clock-in/out, history, and admin management of timeclock entries.",
+    "clock_in_success": "Clock-in recorded.",
+    "clock_out_success": "Clock-out recorded.",
+    "clocked_out": "Clocked out",
+    "confirm_delete_timeclock": "Delete this timeclock entry?",
+    "edit_timeclock": "Edit timeclock entry",
+    "leave_empty_if_active": "leave empty if still running",
+    "no_timeclock_entries": "No time clock entries found.",
+    "this_week": "This week",
+    "timeclock_active": "Running",
+    "timeclock_already_active": "A clock-in is already active — clock out before starting a new one.",
+    "timeclock_deleted": "Timeclock entry deleted.",
+    "timeclock_edited": "Timeclock entry updated.",
+    "timeclock_no_active": "No active clock-in to close."
+}
