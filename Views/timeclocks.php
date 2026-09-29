@@ -135,4 +135,6 @@ endif; ?>
     </div>
 </div>
 
-<script src="<?= $BASE_URL ?>/assets/js/modules/timeclock-admin.js"></script>
+<?php if ($timeclockAdminJs = bundle_asset('timeclock', 'js/timeclock-admin.js')): ?>
+<script src="<?= $timeclockAdminJs ?>"></script>
+<?php endif; ?>

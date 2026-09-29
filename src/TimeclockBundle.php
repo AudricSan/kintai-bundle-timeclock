@@ -43,5 +43,6 @@ final class TimeclockBundle extends Bundle
     {
         $this->loadViewsFrom($this->getPath() . '/Views', 'timeclock');
         $this->loadRoutesFrom($this->getPath() . '/routes.php');
+        $this->loadAssetsFrom('public');
     }
 }

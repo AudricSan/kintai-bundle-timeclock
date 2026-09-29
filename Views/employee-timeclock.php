@@ -21,6 +21,9 @@ $clockInIso  = $isActive ? str_replace(' ', 'T', $clockInTime) : '';
 $_routeVisible  = $route_visible ?? fn(string $r): bool => false;
 $_canSeeManage  = $_routeVisible('admin.timeclocks');
 ?>
+<?php if ($timeclockCss = bundle_asset('timeclock', 'css/timeclock.css')): ?>
+<link rel="stylesheet" href="<?= $timeclockCss ?>">
+<?php endif; ?>
 
 <div id="timeclock-meta"
      data-clock-in-url="<?= route_url('employee.timeclock.clock_in') ?>"
@@ -107,4 +110,6 @@ else: ?>
 echo Card::make()->header(__('this_week'))->body(ob_get_clean())->render();
 ?>
 
-<script src="<?= $BASE_URL ?>/assets/js/modules/timeclock.js"></script>
+<?php if ($timeclockJs = bundle_asset('timeclock', 'js/timeclock.js')): ?>
+<script src="<?= $timeclockJs ?>"></script>
+<?php endif; ?>
