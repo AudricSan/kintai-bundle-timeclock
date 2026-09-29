@@ -1,7 +1,7 @@
 {
     "slug": "timeclock",
     "name": "Pointage",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Pointer/dépointer, historique employé, gestion admin des entrées de pointage.",
     "author": { "name": "AudricSan", "url": "https://github.com/AudricSan" },
     "kintai_core": { "min": "0.1.0", "max": "999.999.999" },
