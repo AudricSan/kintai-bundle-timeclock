@@ -8,6 +8,10 @@ Le schéma de version (X.Y.Z, canaux alpha/beta/main) est décrit dans
 
 ## [Unreleased]
 
+### Fixed
+
+- Sécurité — `POST /api/v1/timeclocks/clock-in` acceptait n'importe quel `store_id` du corps, même un magasin dont l'employé n'est pas membre, et `PUT /api/v1/timeclocks/{id}` laissait modifier `store_id`/`user_id` (déplacer le pointage vers un magasin tiers contournait le contrôle de `requireTimeclock()`). Le magasin du clock-in doit être celui d'un magasin de l'employé, et `user_id`/`store_id`/`created_at` ne changent plus en modification.
+
 ### Changed
 
 - Garde-fou contre les handlers inline, en prévision de la Content-Security-Policy stricte de Kintai Core 0.3.0 (`script-src 'self' 'nonce-…'`, sans `'unsafe-inline'`) : `tests.yml` échoue désormais si un attribut `onclick=`/`onchange=`/`onsubmit=`/`oninput=`, un lien `javascript:` ou un `<script>` sans nonce apparaît dans `Views/` ou `src/` — le navigateur les bloquerait en silence, sans aucune erreur côté serveur. **Aucun changement fonctionnel** : les vues de ce bundle n'utilisent déjà aucun handler inline ni `<script>` inline exécutable. La règle est documentée dans `CONTRIBUTING.md` et `CLAUDE.md`.
