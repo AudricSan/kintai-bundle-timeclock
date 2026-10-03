@@ -74,6 +74,10 @@ final class TimeclockController
             $memberships = $this->storeUsers->findByUser($userId);
             $storeId     = $memberships ? (int) $memberships[0]['store_id'] : 0;
         }
+        // Audit du 03/10/2026 : le store_id du corps n'était jamais comparé aux magasins de l'employé.
+        if ($storeId > 0 && $this->storeUsers->findMembership($storeId, $userId) === null) {
+            throw new \kintai\Core\Exceptions\ForbiddenException(__('error_access_denied'));
+        }
 
         $now    = date('Y-m-d H:i:s');
         $record = $this->timeclocks->save([
@@ -121,7 +125,10 @@ final class TimeclockController
         $old = $this->requireTimeclock($request, 'timeclock.update');
         $id  = (int) $old['id'];
 
-        $data   = array_merge($request->json() ?? [], ['id' => $id, 'updated_at' => date('Y-m-d H:i:s')]);
+        // Audit du 03/10/2026 : l'employé et le magasin du pointage ne changent pas (déplacer l'entrée vers un magasin tiers contournait requireTimeclock()).
+        $body = $request->json() ?? [];
+        unset($body['user_id'], $body['store_id'], $body['created_at']);
+        $data   = array_merge($body, ['id' => $id, 'updated_at' => date('Y-m-d H:i:s')]);
         $record = $this->timeclocks->save($data);
 
         if (!empty($data['clock_in_time']) && !empty($data['clock_out_time'])) {
@@ -131,7 +138,7 @@ final class TimeclockController
             $record   = $this->timeclocks->save(array_merge($record, ['duration_minutes' => $duration]));
         }
 
-        $this->auditLogger->logUpdate($request, 'timeclock.updated', 'timeclock', resourceId: $id, oldData: $old, newData: $record, extraContext: $request->json() ?? [], storeId: isset($data['store_id']) ? (int) $data['store_id'] : null);
+        $this->auditLogger->logUpdate($request, 'timeclock.updated', 'timeclock', resourceId: $id, oldData: $old, newData: $record, extraContext: $body, storeId: (int) ($old['store_id'] ?? 0) ?: null);
         return Response::json($record);
     }
 
