@@ -10,6 +10,10 @@ Le schéma de version (X.Y.Z, canaux alpha/beta/main) est décrit dans
 
 ### Fixed
 
+- Pointage employé multi-magasins : le magasin était toujours le premier de l'employé, et le `store_id` envoyé par le navigateur était ignoré. Un sélecteur de magasin apparaît désormais quand l'employé en a plusieurs ; le magasin choisi doit être l'un des siens. Un employé sans magasin ne peut plus pointer (la ligne était créée avec `store_id = 0`).
+
+### Fixed
+
 - Sécurité — `POST /api/v1/timeclocks/clock-in` acceptait n'importe quel `store_id` du corps, même un magasin dont l'employé n'est pas membre, et `PUT /api/v1/timeclocks/{id}` laissait modifier `store_id`/`user_id` (déplacer le pointage vers un magasin tiers contournait le contrôle de `requireTimeclock()`). Le magasin du clock-in doit être celui d'un magasin de l'employé, et `user_id`/`store_id`/`created_at` ne changent plus en modification.
 
 ### Changed

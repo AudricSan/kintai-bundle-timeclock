@@ -8,6 +8,7 @@ use kintai\UI\Components\Table;
 /** @var array[]     $today_entries  Pointages du jour */
 /** @var array[]     $week_entries   Pointages de la semaine en cours */
 /** @var int         $store_id       Store primaire de l'employé */
+/** @var array[]     $stores         Magasins de l'employé : [['id' => int, 'name' => string], ...] */
 
 $authUser    = $auth_user ?? [];
 $userId      = (int) ($authUser['id'] ?? 0);
@@ -71,6 +72,16 @@ ob_start();
     <?= Button::make(__('clock_out'))->danger()->lg()->attrs(['id' => 'btn-clockout'])->render() ?>
 <?php else: ?>
     <p class="timeclock-status timeclock-status--idle"><?= __('not_clocked_in') ?></p>
+    <?php if (count($stores ?? []) > 1): ?>
+        <div class="form-group timeclock-store">
+            <label class="form-label" for="timeclock-store"><?= __('timeclock_store') ?></label>
+            <select id="timeclock-store" class="form-control">
+                <?php foreach ($stores as $_s): ?>
+                    <option value="<?= (int) $_s['id'] ?>" <?= (int) $_s['id'] === (int) $store_id ? 'selected' : '' ?>><?= htmlspecialchars((string) $_s['name']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    <?php endif; ?>
     <?= Button::make(__('clock_in'))->success()->lg()->attrs(['id' => 'btn-clockin'])->render() ?>
 <?php endif; ?>
 <div id="timeclock-message" class="alert mt-sm hidden"></div>
