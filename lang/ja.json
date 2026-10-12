@@ -1,4 +1,7 @@
 {
+    "timeclock_store": "店舗",
+    "error_timeclock_no_store": "どの店舗にも所属していないため、打刻できません。",
+    "error_timeclock_store_not_member": "選択した店舗のメンバーではありません。",
     "bundle_timeclock": "打刻",
     "bundle_timeclock_desc": "従業員の出退勤打刻、履歴、管理者による打刻記録の管理。",
     "clock_in_success": "出勤打刻を記録しました。",

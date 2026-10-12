@@ -1,4 +1,7 @@
 {
+    "timeclock_store": "Magasin",
+    "error_timeclock_no_store": "Vous n’êtes membre d’aucun magasin : le pointage est impossible.",
+    "error_timeclock_store_not_member": "Vous n’êtes pas membre du magasin choisi.",
     "bundle_timeclock": "Pointage",
     "bundle_timeclock_desc": "Pointer/dépointer côté employé, historique et gestion admin des entrées de pointage.",
     "clock_in_success": "Arrivée enregistrée.",

@@ -1,4 +1,7 @@
 {
+    "timeclock_store": "Store",
+    "error_timeclock_no_store": "You are not a member of any store, so you cannot clock in.",
+    "error_timeclock_store_not_member": "You are not a member of the selected store.",
     "bundle_timeclock": "Timeclock",
     "bundle_timeclock_desc": "Employee clock-in/out, history, and admin management of timeclock entries.",
     "clock_in_success": "Clock-in recorded.",

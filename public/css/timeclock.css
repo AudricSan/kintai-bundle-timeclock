@@ -13,6 +13,11 @@
 .timeclock-status--active { color: var(--color-success); }
 .timeclock-status--idle   { color: var(--color-text-muted); }
 
+.timeclock-store {
+    max-width: 20rem;
+    margin: 0 auto var(--space-4);
+}
+
 .timeclock-clock {
     font-size: 2.5rem;
     font-weight: 700;

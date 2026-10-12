@@ -205,7 +205,10 @@
     if (btnIn) {
         btnIn.addEventListener('click', function () {
             btnIn.disabled = true;
-            apiCall(clockInUrl, { user_id: userId, store_id: storeId, client_time: new Date().toISOString() },
+            // Employé multi-magasins : le magasin choisi dans la liste, sinon le magasin par défaut.
+            var storeSelect = document.getElementById('timeclock-store');
+            var chosenStore = storeSelect ? (parseInt(storeSelect.value, 10) || storeId) : storeId;
+            apiCall(clockInUrl, { user_id: userId, store_id: chosenStore, client_time: new Date().toISOString() },
                 function () {
                     showMessage(meta.dataset.msgClockInOk, 'success');
                     setTimeout(function () { location.reload(); }, 800);
