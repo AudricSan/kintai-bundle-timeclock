@@ -1,10 +1,10 @@
 <?php
-use kintai\UI\Components\Button;
-use kintai\UI\Components\Badge;
-use kintai\UI\Components\Table;
-use kintai\UI\Components\Flash;
-use kintai\UI\Components\FilterBar;
-use kintai\UI\Components\Pagination;
+use kintai\Contract\View\Components\Button;
+use kintai\Contract\View\Components\Badge;
+use kintai\Contract\View\Components\Table;
+use kintai\Contract\View\Components\Flash;
+use kintai\Contract\View\Components\FilterBar;
+use kintai\Contract\View\Components\Pagination;
 
 /** @var array[]  $entries */
 /** @var array    $users_map */
