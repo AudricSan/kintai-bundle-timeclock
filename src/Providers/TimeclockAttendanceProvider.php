@@ -7,7 +7,7 @@ namespace kintai\Bundles\Installed\Timeclock\Providers;
 use kintai\Contract\Container;
 use kintai\Contract\Provider\Attendance;
 use kintai\Contract\Provider\AttendanceProvider;
-use kintai\Core\Repositories\TimeclockRepositoryInterface;
+use kintai\Bundles\Installed\Timeclock\Repositories\TimeclockRepositoryInterface;
 
 /**
  * Pointages pour les tableaux de bord du Core (pointages en cours ou oubliés, retards) — contrat 1.11. Mêmes données
