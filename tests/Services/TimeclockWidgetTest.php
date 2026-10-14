@@ -30,7 +30,7 @@ final class TimeclockWidgetTest extends TestCase
         $active = (new TimeclockWidget($timeclocks, $users))->activeNow([1], [1 => 'Tokorozawa'], '2026-10-14');
 
         $this->assertSame([1], array_column($active, 'id'));
-        $this->assertSame([5, 3], array_column((new TimeclockWidget($timeclocks, $users))->activeNow([1, 2], [], '2026-10-14'), 'id'), 'plus ancienne entrée d'abord');
+        $this->assertSame([5, 1, 3], array_column((new TimeclockWidget($timeclocks, $users))->activeNow([1, 2], [], '2026-10-14'), 'id'), 'plus ancienne entrée d\'abord');
         $this->assertSame(['Sato', 'Tokorozawa'], [$active[0]['user_name'], $active[0]['store_name']]);
     }
 
