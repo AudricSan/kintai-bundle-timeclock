@@ -19,7 +19,8 @@ final class TimeclockWidget
     ) {}
 
     /**
-     * Gérant : pointages du jour sans sortie, dans les magasins de son périmètre, avec le nom de l'employé et du magasin.
+     * Gérant : pointages du jour sans sortie, dans les magasins de son périmètre, avec le nom de l'employé et du magasin,
+     * du plus ancien au plus récent (comme le widget du Core).
      *
      * @param list<int>          $storeIds
      * @param array<int, string> $storesMap id => nom du magasin
@@ -39,6 +40,8 @@ final class TimeclockWidget
         foreach ($this->users->findAll() as $u) {
             $usersMap[(int) $u['id']] = $u['display_name'] ?? $u['email'] ?? ('#' . $u['id']);
         }
+        usort($active, static fn(array $a, array $b): int => strcmp((string) ($a['clock_in_time'] ?? ''), (string) ($b['clock_in_time'] ?? '')));
+
         return array_map(static function (array $tc) use ($usersMap, $storesMap): array {
             $tc['user_name']  = $usersMap[(int) ($tc['user_id'] ?? 0)] ?? ('User #' . (int) ($tc['user_id'] ?? 0));
             $tc['store_name'] = $storesMap[(int) ($tc['store_id'] ?? 0)] ?? ('Store #' . (int) ($tc['store_id'] ?? 0));
