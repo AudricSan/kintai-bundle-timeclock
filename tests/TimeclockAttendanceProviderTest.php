@@ -6,7 +6,7 @@ namespace kintai\Tests\Bundles\Timeclock;
 
 use kintai\Bundles\Installed\Timeclock\Providers\TimeclockAttendanceProvider;
 use kintai\Core\Container;
-use kintai\Core\Repositories\TimeclockRepositoryInterface;
+use kintai\Bundles\Installed\Timeclock\Repositories\TimeclockRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 
 /** Fournisseur de pointages du bundle (contrat 1.11) : mêmes lignes que la lecture historique de la table par le Core. */

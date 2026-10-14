@@ -6,7 +6,7 @@ namespace kintai\Bundles\Installed\Timeclock\Controllers\Web;
 
 use kintai\Contract\Exceptions\NotFoundException;
 use kintai\Contract\Data\StoreRepositoryInterface;
-use kintai\Core\Repositories\TimeclockRepositoryInterface;
+use kintai\Bundles\Installed\Timeclock\Repositories\TimeclockRepositoryInterface;
 use kintai\Contract\Data\UserRepositoryInterface;
 use kintai\Contract\Http\Request;
 use kintai\Contract\Http\Response;

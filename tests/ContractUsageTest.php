@@ -14,9 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class ContractUsageTest extends TestCase
 {
-    private const PENDING_EXTRACTION = [
-        'kintai\\Core\\Repositories\\TimeclockRepositoryInterface',
-    ];
+    private const PENDING_EXTRACTION = [];
 
     public function testOnlyTheBundleContractIsUsed(): void
     {

@@ -12,7 +12,7 @@ use kintai\Core\Exceptions\NotFoundException;
 use kintai\Core\Repositories\LogRepositoryInterface;
 use kintai\Core\Repositories\StoreRepositoryInterface;
 use kintai\Core\Repositories\StoreUserRepositoryInterface;
-use kintai\Core\Repositories\TimeclockRepositoryInterface;
+use kintai\Bundles\Installed\Timeclock\Repositories\TimeclockRepositoryInterface;
 use kintai\Core\Request;
 use kintai\Core\Services\AuditLogger;
 use kintai\Core\Services\Log;

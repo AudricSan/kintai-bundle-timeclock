@@ -9,7 +9,7 @@ use kintai\Contract\Exceptions\NotFoundException;
 use kintai\Contract\Exceptions\ValidationException;
 use kintai\Contract\Data\StoreRepositoryInterface;
 use kintai\Contract\Data\StoreUserRepositoryInterface;
-use kintai\Core\Repositories\TimeclockRepositoryInterface;
+use kintai\Bundles\Installed\Timeclock\Repositories\TimeclockRepositoryInterface;
 use kintai\Contract\Http\Request;
 use kintai\Contract\Http\Response;
 use kintai\Contract\Services\AuditLogger;
