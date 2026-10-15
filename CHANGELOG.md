@@ -21,6 +21,7 @@ Le schéma de version (X.Y.Z, canaux alpha/beta/main) est décrit dans
 
 ### Fixed
 
+- API en libre-service (audit n°8 de Kintai) : un employé sans permission lit enfin ses propres pointages avec `GET /api/v1/timeclocks?user_id=<son id>`. La liste lui était toujours renvoyée vide : le filtrage par permission retirait aussi ses propres éléments. Il ne voit jamais ceux des autres ; un gérant garde exactement sa vue. Nouveau test `ApiSelfServiceListTest`.
 - Description de `bundle.json` alignée sur celle de `lang/fr.json`, pour que le catalogue et la page Bundles affichent le même texte.
 - Widget « Pointages actifs » du tableau de bord gérant : les pointages en cours sont de nouveau listés du plus ancien au plus récent, comme le faisait le widget du Core avant sa reprise par le bundle.
 - Pointage employé multi-magasins : le magasin était toujours le premier de l'employé, et le `store_id` envoyé par le navigateur était ignoré. Un sélecteur de magasin apparaît désormais quand l'employé en a plusieurs ; le magasin choisi doit être l'un des siens. Un employé sans magasin ne peut plus pointer (la ligne était créée avec `store_id = 0`).
