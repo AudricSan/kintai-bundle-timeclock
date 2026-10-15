@@ -2,7 +2,7 @@
     "slug": "timeclock",
     "name": "Pointage",
     "version": "1.2.0",
-    "description": "Pointer/dépointer, historique employé, gestion admin des entrées de pointage.",
+    "description": "Pointer/dépointer côté employé, historique et gestion admin des entrées de pointage.",
     "author": {
         "name": "AudricSan",
         "url": "https://github.com/AudricSan"
