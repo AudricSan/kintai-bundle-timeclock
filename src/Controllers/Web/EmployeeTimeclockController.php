@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace kintai\Bundles\Installed\Timeclock\Controllers\Web;
 
-use kintai\Core\Exceptions\ConflictException;
-use kintai\Core\Exceptions\NotFoundException;
-use kintai\Core\Exceptions\ValidationException;
-use kintai\Core\Repositories\StoreRepositoryInterface;
-use kintai\Core\Repositories\StoreUserRepositoryInterface;
-use kintai\Core\Repositories\TimeclockRepositoryInterface;
-use kintai\Core\Request;
-use kintai\Core\Response;
-use kintai\Core\Services\AuditLogger;
-use kintai\UI\Controller\Web\HasBaseUrl;
-use kintai\UI\Controller\Web\HasStoreFeatureCheck;
-use kintai\UI\ViewRenderer;
+use kintai\Contract\Exceptions\ConflictException;
+use kintai\Contract\Exceptions\NotFoundException;
+use kintai\Contract\Exceptions\ValidationException;
+use kintai\Contract\Data\StoreRepositoryInterface;
+use kintai\Contract\Data\StoreUserRepositoryInterface;
+use kintai\Bundles\Installed\Timeclock\Repositories\TimeclockRepositoryInterface;
+use kintai\Contract\Http\Request;
+use kintai\Contract\Http\Response;
+use kintai\Contract\Services\AuditLogger;
+use kintai\Contract\Http\Concerns\HasBaseUrl;
+use kintai\Contract\Http\Concerns\HasStoreFeatureCheck;
+use kintai\Contract\View\ViewRenderer;
 
 final class EmployeeTimeclockController
 {

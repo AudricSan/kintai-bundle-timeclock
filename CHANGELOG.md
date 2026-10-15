@@ -8,8 +8,21 @@ Le schéma de version (X.Y.Z, canaux alpha/beta/main) est décrit dans
 
 ## [Unreleased]
 
+### Changed
+
+- Tests : la lecture des pointages d'un magasin sur une période (`findByStoreBetween()`, widget RH du Core) et l'index (magasin, jour) d'une table créée par le bundle sont vérifiés ici (`DatabaseTimeclockRepositoryTest`, repris du Core).
+- Extraction du Core (étape 4 du plan du contrat) : le bundle possède désormais tout son code et ses données. Le modèle `Timeclock` et le dépôt `TimeclockRepositoryInterface` / `DatabaseTimeclockRepository` (`src/Models`, `src/Repositories`) quittent le Core ; la table `timeclocks` garde son nom et ses données. Une migration la crée si elle manque (installation neuve, avec l'index magasin + jour) ; une seconde ajoute aux instances installées avec l'ancien schéma SQL les colonnes qui leur manquaient (`shift_id`, `clock_in_ip`, `clock_out_ip`, vides) ; une table déjà complète n'est pas touchée. Les widgets « Pointages actifs » (tableau de bord gérant) et « Pointage » (tableau de bord employé) sont désormais fournis par le bundle (`dashboardWidgets()`, mêmes clés `timeclocks_today` et `timeclock` : les préférences sont conservées) ; ils s'affichent avec les widgets des autres bundles (leur position change, leur contenu non) et la case « Pointages actifs » du panneau « Personnaliser » n'est proposée qu'aux utilisateurs qui ont `timeclock.view`. Désactivé ou désinstallé, le bundle ne fournit plus de pointages au Core (alerte « pointages oubliés », retards du widget RH). Les libellés de la catégorie de permissions, de la fonctionnalité, du journal d'activité, des widgets et des messages d'erreur passent dans `lang/`. `ContractUsageTest` n'admet plus aucune classe du Core hors contrat ; `ContractDeclarationsTest` vérifie chaque déclaration valeur par valeur. Tests repris du Core (affectation de masse de l'API) ; nouveaux tests `TimeclocksMigrationTest` (installation neuve, ancien schéma avec données, schéma déjà complet) et `TimeclockWidgetTest`.
+- Contrat de bundle versionné : le bundle n'utilise plus que les noms du contrat `kintai\Contract\…` du Core (requête, réponse, routes, middlewares, exceptions, droits, données du Core, services, vues et composants) et déclare `"kintai_contract": "^1.0"` dans `bundle.json` (`kintai_core.min` relevé à `0.3.6`, première version du Core qui fournit le contrat). Nouveau test `ContractUsageTest` : toute utilisation du Core hors contrat échoue, hormis 1 classe(s) propre(s) au bundle qui vivent encore dans le Core (extraction prévue).
+
+### Added
+
+- Contrat de bundle 1.11 : le bundle déclare lui-même ce qu'il apporte au Core (`navigation()`, `permissions()`, `storeFeatures()`, `attendanceProviders()`) au lieu que le Core le connaisse à l'avance ; déclarations identiques à ce que le Core affichait pour ce bundle, rien ne change à l'écran. `bundle.json` demande désormais `"kintai_contract": "^1.11"` (Kintai Core avec les points d'extension et fournisseurs du contrat). Nouveau test `ContractDeclarationsTest` : chaque déclaration est comparée au repli historique du Core.
+- Socle de tests PHPUnit (composer.json, phpunit.xml) et CI qui l'exécute contre le vrai Core : les tests que le Core faisait tourner sur une copie figée du bundle (fixtures 1.0.0) vivent désormais ici et testent le code réel.
+
 ### Fixed
 
+- Description de `bundle.json` alignée sur celle de `lang/fr.json`, pour que le catalogue et la page Bundles affichent le même texte.
+- Widget « Pointages actifs » du tableau de bord gérant : les pointages en cours sont de nouveau listés du plus ancien au plus récent, comme le faisait le widget du Core avant sa reprise par le bundle.
 - Pointage employé multi-magasins : le magasin était toujours le premier de l'employé, et le `store_id` envoyé par le navigateur était ignoré. Un sélecteur de magasin apparaît désormais quand l'employé en a plusieurs ; le magasin choisi doit être l'un des siens. Un employé sans magasin ne peut plus pointer (la ligne était créée avec `store_id = 0`).
 
 ### Fixed

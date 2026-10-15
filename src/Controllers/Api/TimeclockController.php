@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace kintai\Bundles\Installed\Timeclock\Controllers\Api;
 
-use kintai\Core\Api\Paginator;
-use kintai\Core\Auth\PermissionService;
-use kintai\Core\Exceptions\ConflictException;
-use kintai\Core\Exceptions\NotFoundException;
-use kintai\Core\Repositories\StoreUserRepositoryInterface;
-use kintai\Core\Repositories\TimeclockRepositoryInterface;
-use kintai\Core\Request;
-use kintai\Core\Response;
-use kintai\Core\Services\AuditLogger;
+use kintai\Contract\Http\Paginator;
+use kintai\Contract\Auth\PermissionService;
+use kintai\Contract\Exceptions\ConflictException;
+use kintai\Contract\Exceptions\NotFoundException;
+use kintai\Contract\Data\StoreUserRepositoryInterface;
+use kintai\Bundles\Installed\Timeclock\Repositories\TimeclockRepositoryInterface;
+use kintai\Contract\Http\Request;
+use kintai\Contract\Http\Response;
+use kintai\Contract\Services\AuditLogger;
 
 /**
  * Régression (audit RBAC du 11/09/2026) : mêmes correctifs que
@@ -76,7 +76,7 @@ final class TimeclockController
         }
         // Audit du 03/10/2026 : le store_id du corps n'était jamais comparé aux magasins de l'employé.
         if ($storeId > 0 && $this->storeUsers->findMembership($storeId, $userId) === null) {
-            throw new \kintai\Core\Exceptions\ForbiddenException(__('error_access_denied'));
+            throw new \kintai\Contract\Exceptions\ForbiddenException(__('error_access_denied'));
         }
 
         $now    = date('Y-m-d H:i:s');
