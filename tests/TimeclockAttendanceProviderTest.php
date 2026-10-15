@@ -22,7 +22,7 @@ final class TimeclockAttendanceProviderTest extends TestCase
             ['id' => 3, 'user_id' => 5, 'store_id' => 2, 'shift_date' => '2026-10-14', 'clock_in_time' => '2026-10-14 10:00:00', 'clock_out_time' => ''],
             ['id' => 4, 'user_id' => 5, 'store_id' => 2, 'shift_date' => '2026-10-14', 'clock_in_time' => null, 'clock_out_time' => null],
         ];
-        $this->repo = $this->createMock(TimeclockRepositoryInterface::class);
+        $this->repo = $this->createStub(TimeclockRepositoryInterface::class);
         $this->repo->method('findAll')->willReturn($rows);
         $this->repo->method('findByStoreBetween')->willReturnCallback(fn(int $s, string $from, string $to) => array_values(array_filter(
             $rows,
