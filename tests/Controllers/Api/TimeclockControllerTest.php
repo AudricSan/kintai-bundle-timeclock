@@ -17,6 +17,7 @@ use kintai\Bundles\Installed\Timeclock\Repositories\TimeclockRepositoryInterface
 use kintai\Core\Request;
 use kintai\Core\Services\AuditLogger;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -26,24 +27,33 @@ use PHPUnit\Framework\TestCase;
  */
 final class TimeclockControllerTest extends TestCase
 {
-    private TimeclockRepositoryInterface&MockObject $timeclocks;
-    private StoreUserRepositoryInterface&MockObject $storeUsers;
-    private RoleAssignmentRepositoryInterface&MockObject $assignments;
-    private RoleRepositoryInterface&MockObject $roles;
-    private TimeclockController $controller;
+    private TimeclockRepositoryInterface&Stub $timeclocks;
+    private StoreUserRepositoryInterface&Stub $storeUsers;
+    private RoleAssignmentRepositoryInterface&Stub $assignments;
+    private RoleRepositoryInterface&Stub $roles;
+    private ?TimeclockController $controller = null;
 
     protected function setUp(): void
     {
-        $this->timeclocks  = $this->createMock(TimeclockRepositoryInterface::class);
-        $this->storeUsers  = $this->createMock(StoreUserRepositoryInterface::class);
-        $this->assignments = $this->createMock(RoleAssignmentRepositoryInterface::class);
-        $this->roles       = $this->createMock(RoleRepositoryInterface::class);
-        $this->controller  = new TimeclockController(
-            $this->timeclocks,
-            $this->storeUsers,
-            new AuditLogger(),
-            new PermissionService($this->assignments, $this->roles)
-        );
+        $this->timeclocks  = $this->createStub(TimeclockRepositoryInterface::class);
+        $this->storeUsers  = $this->createStub(StoreUserRepositoryInterface::class);
+        $this->assignments = $this->createStub(RoleAssignmentRepositoryInterface::class);
+        $this->roles       = $this->createStub(RoleRepositoryInterface::class);
+    }
+
+    /** Objet testé, construit à la première utilisation : un test peut d'abord remplacer un bouchon par un mock. */
+    private function controller(): TimeclockController
+    {
+        if ($this->controller === null) {
+            $this->controller  = new TimeclockController(
+                $this->timeclocks,
+                $this->storeUsers,
+                new AuditLogger(),
+                new PermissionService($this->assignments, $this->roles)
+            );
+        }
+
+        return $this->controller;
     }
 
     protected function tearDown(): void
@@ -55,10 +65,10 @@ final class TimeclockControllerTest extends TestCase
 
     private function requestAsOwner(): Request
     {
-        $this->assignments->method('findByUser')->with(1)->willReturn([
+        $this->assignments->method('findByUser')->willReturnCallback(fn($a0) => $a0 === 1 ? [
             ['id' => 1, 'user_id' => 1, 'role_id' => 10, 'scope_type' => 'global', 'scope_id' => null],
-        ]);
-        $this->roles->method('findById')->with(10)->willReturn(['id' => 10, 'is_system' => 1]);
+        ] : []);
+        $this->roles->method('findById')->willReturnCallback(fn($a0) => $a0 === 10 ? ['id' => 10, 'is_system' => 1] : null);
 
         $req = new Request();
         $req->setAttribute('auth_user', ['id' => 1]);
@@ -68,11 +78,11 @@ final class TimeclockControllerTest extends TestCase
     /** Manager avec timeclock.* uniquement sur le store $storeId. */
     private function requestAsStoreManager(int $userId, int $storeId): Request
     {
-        $this->assignments->method('findByUser')->with($userId)->willReturn([
+        $this->assignments->method('findByUser')->willReturnCallback(fn($a0) => $a0 === $userId ? [
             ['id' => 1, 'user_id' => $userId, 'role_id' => 20, 'scope_type' => 'store', 'scope_id' => $storeId],
-        ]);
-        $this->roles->method('findById')->with(20)->willReturn(['id' => 20, 'is_system' => 0]);
-        $this->roles->method('getPermissions')->with(20)->willReturn(['timeclock.view', 'timeclock.update', 'timeclock.delete']);
+        ] : []);
+        $this->roles->method('findById')->willReturnCallback(fn($a0) => $a0 === 20 ? ['id' => 20, 'is_system' => 0] : null);
+        $this->roles->method('getPermissions')->willReturnCallback(fn($a0) => $a0 === 20 ? ['timeclock.view', 'timeclock.update', 'timeclock.delete'] : []);
 
         $req = new Request();
         $req->setAttribute('auth_user', ['id' => $userId]);
@@ -81,7 +91,7 @@ final class TimeclockControllerTest extends TestCase
 
     public function testIndexReturnsEmptyWithoutFilters(): void
     {
-        $response = $this->controller->index($this->requestAsOwner());
+        $response = $this->controller()->index($this->requestAsOwner());
 
         $body = json_decode($response->body(), true);
         $this->assertSame([], $body['data']);
@@ -89,11 +99,12 @@ final class TimeclockControllerTest extends TestCase
 
     public function testIndexFiltersByStoreAndDate(): void
     {
+        $this->timeclocks = $this->createMock(TimeclockRepositoryInterface::class);
         $_GET = ['store_id' => '5', 'date' => '2026-08-01'];
 
-        $this->timeclocks->method('findByStoreAndDate')->with(5, '2026-08-01')->willReturn([['id' => 1, 'store_id' => 5]]);
+        $this->timeclocks->expects($this->atLeastOnce())->method('findByStoreAndDate')->with(5, '2026-08-01')->willReturn([['id' => 1, 'store_id' => 5]]);
 
-        $response = $this->controller->index($this->requestAsOwner());
+        $response = $this->controller()->index($this->requestAsOwner());
         $body = json_decode($response->body(), true);
 
         $this->assertCount(1, $body['data']);
@@ -101,14 +112,15 @@ final class TimeclockControllerTest extends TestCase
 
     public function testIndexByUserIdExcludesEntriesFromOtherStoresForScopedManager(): void
     {
+        $this->timeclocks = $this->createMock(TimeclockRepositoryInterface::class);
         $_GET = ['user_id' => '99'];
 
-        $this->timeclocks->method('findByUser')->with(99)->willReturn([
+        $this->timeclocks->expects($this->atLeastOnce())->method('findByUser')->with(99)->willReturn([
             ['id' => 1, 'store_id' => 5],
             ['id' => 2, 'store_id' => 9],
         ]);
 
-        $response = $this->controller->index($this->requestAsStoreManager(2, 5));
+        $response = $this->controller()->index($this->requestAsStoreManager(2, 5));
         $body = json_decode($response->body(), true);
 
         $this->assertCount(1, $body['data']);
@@ -117,23 +129,25 @@ final class TimeclockControllerTest extends TestCase
 
     public function testClockInRejectsWhenAlreadyActive(): void
     {
+        $this->timeclocks = $this->createMock(TimeclockRepositoryInterface::class);
         $req = $this->requestWithJson(['user_id' => 1]);
 
-        $this->timeclocks->method('findActiveByUser')->with(1)->willReturn(['id' => 5]);
+        $this->timeclocks->expects($this->atLeastOnce())->method('findActiveByUser')->with(1)->willReturn(['id' => 5]);
         $this->timeclocks->expects($this->never())->method('save');
 
         $this->expectException(ConflictException::class);
-        $this->controller->clockIn($req);
+        $this->controller()->clockIn($req);
     }
 
     public function testClockOutThrowsWhenNoActiveEntry(): void
     {
+        $this->timeclocks = $this->createMock(TimeclockRepositoryInterface::class);
         $req = $this->requestWithJson(['user_id' => 1]);
 
-        $this->timeclocks->method('findActiveByUser')->with(1)->willReturn(null);
+        $this->timeclocks->expects($this->atLeastOnce())->method('findActiveByUser')->with(1)->willReturn(null);
 
         $this->expectException(NotFoundException::class);
-        $this->controller->clockOut($req);
+        $this->controller()->clockOut($req);
     }
 
     /**
@@ -151,38 +165,41 @@ final class TimeclockControllerTest extends TestCase
 
     public function testDestroyDeletesExistingEntry(): void
     {
-        $this->timeclocks->method('findById')->with(7)->willReturn(['id' => 7, 'store_id' => 5]);
+        $this->timeclocks = $this->createMock(TimeclockRepositoryInterface::class);
+        $this->timeclocks->expects($this->atLeastOnce())->method('findById')->with(7)->willReturn(['id' => 7, 'store_id' => 5]);
         $this->timeclocks->expects($this->once())->method('delete')->with(7);
 
         $req = $this->requestAsOwner();
         $req->setRouteParams(['id' => '7']);
 
-        $response = $this->controller->destroy($req);
+        $response = $this->controller()->destroy($req);
 
         $this->assertSame(204, $response->status());
     }
 
     public function testDestroyRejectsEntryFromAnotherStore(): void
     {
-        $this->timeclocks->method('findById')->with(7)->willReturn(['id' => 7, 'store_id' => 9]);
+        $this->timeclocks = $this->createMock(TimeclockRepositoryInterface::class);
+        $this->timeclocks->expects($this->atLeastOnce())->method('findById')->with(7)->willReturn(['id' => 7, 'store_id' => 9]);
         $this->timeclocks->expects($this->never())->method('delete');
 
         $req = $this->requestAsStoreManager(2, 5);
         $req->setRouteParams(['id' => '7']);
 
         $this->expectException(ForbiddenException::class);
-        $this->controller->destroy($req);
+        $this->controller()->destroy($req);
     }
 
     public function testUpdateRejectsEntryFromAnotherStore(): void
     {
-        $this->timeclocks->method('findById')->with(7)->willReturn(['id' => 7, 'store_id' => 9]);
+        $this->timeclocks = $this->createMock(TimeclockRepositoryInterface::class);
+        $this->timeclocks->expects($this->atLeastOnce())->method('findById')->with(7)->willReturn(['id' => 7, 'store_id' => 9]);
         $this->timeclocks->expects($this->never())->method('save');
 
         $req = $this->requestAsStoreManager(2, 5);
         $req->setRouteParams(['id' => '7']);
 
         $this->expectException(ForbiddenException::class);
-        $this->controller->update($req);
+        $this->controller()->update($req);
     }
 }
