@@ -57,7 +57,7 @@ final class TimeclockBundle extends Bundle
     public function navigation(): array
     {
         return [
-            new NavItem('timeclocks', NavItem::PLANNING, 'timeclocks', 'admin.timeclocks', 'employee.timeclock',
+            new NavItem('timeclocks', NavItem::PLANNING, 'timeclock_timeclocks', 'admin.timeclocks', 'employee.timeclock',
                 icon: 'clock', employeeLabel: 'timeclock', activePaths: ['/admin/timeclocks', '/employee/timeclock'],
                 storeFeature: 'timeclock', order: 40, mobile: true),
         ];
@@ -76,7 +76,7 @@ final class TimeclockBundle extends Bundle
      */
     public function storeFeatures(): array
     {
-        return [new StoreFeature('timeclock', 'feature_timeclock', 'feature_timeclock_desc', '🕐', 20)];
+        return [new StoreFeature('timeclock', 'timeclock_feature_timeclock', 'timeclock_feature_desc', '🕐', 20)];
     }
 
     /**
@@ -97,7 +97,7 @@ final class TimeclockBundle extends Bundle
         $widget = static fn(): TimeclockWidget => Container::getInstance()->make(TimeclockWidget::class);
 
         return [
-            new DashboardWidget('timeclocks_today', DashboardWidget::MANAGER, 'widget_timeclocks_today', 'timeclock::widgets.dashboard-manager',
+            new DashboardWidget('timeclocks_today', DashboardWidget::MANAGER, 'timeclock_widget_timeclocks_today', 'timeclock::widgets.dashboard-manager',
                 static fn(array $ctx): array => ['active_clocks_now' => $widget()->activeNow(
                     array_map('intval', $ctx['store_ids'] ?? []), (array) ($ctx['stores_map'] ?? []), (string) ($ctx['today'] ?? date('Y-m-d'))
                 )],
