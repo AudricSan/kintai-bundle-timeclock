@@ -74,7 +74,7 @@ final class TimeclockController
         $userId = (int) ($data['user_id'] ?? 0);
 
         if ($this->timeclocks->findActiveByUser($userId) !== null) {
-            throw new ConflictException(__('error_clockin_already_active'));
+            throw new ConflictException(__('timeclock_error_clockin_already_active'));
         }
 
         $storeId = (int) ($data['store_id'] ?? 0);
@@ -110,7 +110,7 @@ final class TimeclockController
 
         $active = $this->timeclocks->findActiveByUser($userId);
         if ($active === null) {
-            throw new NotFoundException(__('error_no_active_clockin'));
+            throw new NotFoundException(__('timeclock_error_no_active_clockin'));
         }
 
         $now          = date('Y-m-d H:i:s');
@@ -173,7 +173,7 @@ final class TimeclockController
             fn(int $id) => $this->timeclocks->findById($id),
             (int) $request->param('id'),
             $permissionKey,
-            notFoundMessage: __('error_timeclock_entry_not_found'),
+            notFoundMessage: __('timeclock_error_entry_not_found'),
         );
     }
 }

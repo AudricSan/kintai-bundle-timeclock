@@ -12,12 +12,12 @@ use kintai\Contract\View\Components\Card;
 $activeClock = $active_clock ?? null;
 ob_start();
 if ($activeClock !== null):
-    echo Badge::make(__('clocked_in'))->success()->render();
-    echo ' <span class="text-muted">' . __('clocked_in_since') . ' <strong>' . htmlspecialchars(substr($activeClock['clock_in_time'] ?? '', 11, 5)) . '</strong></span>';
-    echo ' ' . Button::make(__('clock_out'))->danger()->sm()->link(route_url('employee.timeclock'))->render();
+    echo Badge::make(__('timeclock_clocked_in'))->success()->render();
+    echo ' <span class="text-muted">' . __('timeclock_clocked_in_since') . ' <strong>' . htmlspecialchars(substr($activeClock['clock_in_time'] ?? '', 11, 5)) . '</strong></span>';
+    echo ' ' . Button::make(__('timeclock_clock_out'))->danger()->sm()->link(route_url('employee.timeclock'))->render();
 else:
-    echo Badge::make(__('not_clocked_in'))->neutral()->render();
-    echo ' ' . Button::make(__('clock_in'))->success()->sm()->link(route_url('employee.timeclock'))->render();
+    echo Badge::make(__('timeclock_not_clocked_in'))->neutral()->render();
+    echo ' ' . Button::make(__('timeclock_clock_in'))->success()->sm()->link(route_url('employee.timeclock'))->render();
 endif;
 echo Card::make()
     ->header('<span>' . __('timeclock') . '</span> ' . Button::make(__('view_all'))->ghost()->sm()->link(route_url('employee.timeclock'))->render())

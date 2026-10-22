@@ -8,11 +8,11 @@
 ?>
 <div class="card card--mt">
     <div class="card-header">
-        <span><?= __('widget_timeclocks_today') ?></span>
+        <span><?= __('timeclock_widget_timeclocks_today') ?></span>
         <a href="<?= route_url('admin.timeclocks') ?>" class="card-header-link"><?= __('view_all') ?></a>
     </div>
     <?php if (empty($active_clocks_now)): ?>
-        <div class="empty-state"><?= __('no_active_timeclock') ?></div>
+        <div class="empty-state"><?= __('timeclock_no_active_timeclock') ?></div>
     <?php else: ?>
         <div class="table-wrap">
             <table class="data-table" data-mob-stack>
@@ -20,8 +20,8 @@
                     <tr>
                         <th><?= __('user') ?></th>
                         <th><?= __('store') ?></th>
-                        <th><?= __('clock_in') ?></th>
-                        <th><?= __('duration') ?></th>
+                        <th><?= __('timeclock_clock_in') ?></th>
+                        <th><?= __('timeclock_duration') ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,8 +42,8 @@
                         <tr>
                             <td data-label="<?= htmlspecialchars(__('user')) ?>"><?= htmlspecialchars($tc['user_name']) ?></td>
                             <td data-label="<?= htmlspecialchars(__('store')) ?>"><?= htmlspecialchars($tc['store_name']) ?></td>
-                            <td data-label="<?= htmlspecialchars(__('clock_in')) ?>" class="td-mono"><?= htmlspecialchars($clockInFmt) ?></td>
-                            <td data-label="<?= htmlspecialchars(__('duration')) ?>" class="td-nowrap"><?= $dh ?>h<?= str_pad((string)$dm, 2, '0', STR_PAD_LEFT) ?></td>
+                            <td data-label="<?= htmlspecialchars(__('timeclock_clock_in')) ?>" class="td-mono"><?= htmlspecialchars($clockInFmt) ?></td>
+                            <td data-label="<?= htmlspecialchars(__('timeclock_duration')) ?>" class="td-nowrap"><?= $dh ?>h<?= str_pad((string)$dm, 2, '0', STR_PAD_LEFT) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

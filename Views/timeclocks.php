@@ -29,14 +29,14 @@ echo Flash::fromQuery('success', [
 ])->render();
 ?>
 <div class="page-header">
-    <h2 class="page-header__title"><?= __('timeclocks') ?> <span class="page-count">(<?= $total ?>)</span></h2>
+    <h2 class="page-header__title"><?= __('timeclock_timeclocks') ?> <span class="page-count">(<?= $total ?>)</span></h2>
 </div>
 
 <div class="shifts-toolbar">
     <div class="btn-group btn-group--switcher btn-group--switcher-2">
         <span class="btn-group__thumb btn-group__thumb--pos-1" aria-hidden="true"></span>
-        <a href="<?= route_url('employee.timeclock') ?>" class="btn btn--ghost btn--sm"><?= __('my_timeclock') ?></a>
-        <a href="<?= route_url('admin.timeclocks') ?>" class="btn btn--ghost btn--sm btn--active"><?= __('timeclocks') ?></a>
+        <a href="<?= route_url('employee.timeclock') ?>" class="btn btn--ghost btn--sm"><?= __('timeclock_my_timeclock') ?></a>
+        <a href="<?= route_url('admin.timeclocks') ?>" class="btn btn--ghost btn--sm btn--active"><?= __('timeclock_timeclocks') ?></a>
     </div>
 </div>
 
@@ -54,20 +54,20 @@ echo Flash::fromQuery('success', [
 <div class="card">
 <?= Table::make()
     ->data($entries)
-    ->emptyMessage(__('no_timeclock_entries'))
+    ->emptyMessage(__('timeclock_no_entries'))
     ->column('#', fn($e) => (string) (int) ($e['id'] ?? 0))
     ->column(__('employee'), fn($e) =>
         '<a href="' . htmlspecialchars($BASE_URL . '/admin/users/' . (int)($e['user_id'] ?? 0) . '/edit') . '">'
         . htmlspecialchars($users_map[(int)($e['user_id'] ?? 0)] ?? '—') . '</a>')
     ->column(__('store'), fn($e) => htmlspecialchars($stores_map[(int)($e['store_id'] ?? 0)] ?? '—'))
-    ->column(__('clock_in'), fn($e) => htmlspecialchars(substr($e['clock_in_time'] ?? '', 0, 16)))
-    ->column(__('clock_out'), function($e) {
+    ->column(__('timeclock_clock_in'), fn($e) => htmlspecialchars(substr($e['clock_in_time'] ?? '', 0, 16)))
+    ->column(__('timeclock_clock_out'), function($e) {
         if (empty($e['clock_out_time'])) {
             return Badge::make(__('timeclock_active'))->warning()->render();
         }
         return htmlspecialchars(substr($e['clock_out_time'], 0, 16));
     })
-    ->column(__('duration'), function($e) {
+    ->column(__('timeclock_duration'), function($e) {
         if (!empty($e['clock_out_time']) && $e['duration_minutes'] !== null && $e['duration_minutes'] !== '') {
             $m = (int) $e['duration_minutes'];
             return floor($m / 60) . 'h' . str_pad((string)($m % 60), 2, '0', STR_PAD_LEFT);
@@ -76,8 +76,8 @@ echo Flash::fromQuery('success', [
     })
     ->column(__('status'), function($e) {
         return empty($e['clock_out_time'])
-            ? Badge::make(__('clocked_in'))->success()->render()
-            : Badge::make(__('clocked_out'))->inactive()->render();
+            ? Badge::make(__('timeclock_clocked_in'))->success()->render()
+            : Badge::make(__('timeclock_clocked_out'))->inactive()->render();
     })
     ->column('', function($e) use ($BASE_URL, $filter_date) {
         $id = (int) ($e['id'] ?? 0);
@@ -88,7 +88,7 @@ echo Flash::fromQuery('success', [
             . ' data-clock-out="' . htmlspecialchars(substr($e['clock_out_time'] ?? '', 0, 16)) . '">'
             . __('edit') . '</button>';
         $html .= '<form method="POST" action="' . htmlspecialchars($BASE_URL . '/admin/timeclocks/' . $id . '/delete?date=' . urlencode($filter_date)) . '"'
-            . ' data-confirm="' . htmlspecialchars(__('confirm_delete_timeclock'), ENT_QUOTES) . '">'
+            . ' data-confirm="' . htmlspecialchars(__('timeclock_confirm_delete_timeclock'), ENT_QUOTES) . '">'
             . csrf_field() . Button::make(__('delete'))->danger()->sm()->submit()->render() . '</form>';
         $html .= '</div>';
         return $html;
@@ -111,7 +111,7 @@ endif; ?>
     <div class="modal__backdrop js-tc-close"></div>
     <div class="modal__dialog">
         <div class="modal__header">
-            <h3 class="modal__title"><?= __('edit_timeclock') ?></h3>
+            <h3 class="modal__title"><?= __('timeclock_edit_timeclock') ?></h3>
             <button type="button" class="modal__close js-tc-close">✕</button>
         </div>
         <form id="tc-edit-form" method="POST" action="">
@@ -119,11 +119,11 @@ endif; ?>
             <input type="hidden" name="redirect_date" value="<?= htmlspecialchars($filter_date) ?>">
             <div class="modal__body">
                 <div class="form-group">
-                    <label class="form-label form-label--required"><?= __('clock_in') ?></label>
+                    <label class="form-label form-label--required"><?= __('timeclock_clock_in') ?></label>
                     <input type="datetime-local" name="clock_in_time" id="tc-in" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label"><?= __('clock_out') ?> <small class="text-muted">(<?= __('leave_empty_if_active') ?>)</small></label>
+                    <label class="form-label"><?= __('timeclock_clock_out') ?> <small class="text-muted">(<?= __('timeclock_leave_empty_if_active') ?>)</small></label>
                     <input type="datetime-local" name="clock_out_time" id="tc-out" class="form-control">
                 </div>
             </div>

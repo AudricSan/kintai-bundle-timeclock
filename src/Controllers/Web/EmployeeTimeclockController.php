@@ -176,14 +176,14 @@ final class EmployeeTimeclockController
     {
         $storeIds = $this->memberStoreIds($userId);
         if ($storeIds === []) {
-            throw new ValidationException(['store_id' => __('error_timeclock_no_store')]);
+            throw new ValidationException(['store_id' => __('timeclock_error_no_store')]);
         }
         $requested = is_numeric($requested) ? (int) $requested : 0;
         if ($requested <= 0) {
             return $storeIds[0];
         }
         if (!in_array($requested, $storeIds, true)) {
-            throw new ValidationException(['store_id' => __('error_timeclock_store_not_member')]);
+            throw new ValidationException(['store_id' => __('timeclock_error_store_not_member')]);
         }
         return $requested;
     }

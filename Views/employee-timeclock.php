@@ -34,8 +34,8 @@ $_canSeeManage  = $_routeVisible('admin.timeclocks');
      data-store-id="<?= (int) ($store_id ?? 0) ?>"
      data-clocked-in="<?= $isActive ? '1' : '0' ?>"
      data-clock-in-ts="<?= htmlspecialchars($clockInIso) ?>"
-     data-msg-clock-in-ok="<?= htmlspecialchars(__('clock_in_success')) ?>"
-     data-msg-clock-out-ok="<?= htmlspecialchars(__('clock_out_success')) ?>"
+     data-msg-clock-in-ok="<?= htmlspecialchars(__('timeclock_clock_in_success')) ?>"
+     data-msg-clock-out-ok="<?= htmlspecialchars(__('timeclock_clock_out_success')) ?>"
      data-msg-error="<?= htmlspecialchars(__('error_generic')) ?>"
      data-msg-pending-one="<?= htmlspecialchars(__('timeclock_pending_one')) ?>"
      data-msg-pending-many="<?= htmlspecialchars(__('timeclock_pending_many')) ?>"
@@ -51,8 +51,8 @@ $_canSeeManage  = $_routeVisible('admin.timeclocks');
 <div class="shifts-toolbar">
     <div class="btn-group btn-group--switcher btn-group--switcher-2">
         <span class="btn-group__thumb btn-group__thumb--pos-0" aria-hidden="true"></span>
-        <a href="<?= route_url('employee.timeclock') ?>" class="btn btn--ghost btn--sm btn--active"><?= __('my_timeclock') ?></a>
-        <a href="<?= route_url('admin.timeclocks') ?>" class="btn btn--ghost btn--sm"><?= __('timeclocks') ?></a>
+        <a href="<?= route_url('employee.timeclock') ?>" class="btn btn--ghost btn--sm btn--active"><?= __('timeclock_my_timeclock') ?></a>
+        <a href="<?= route_url('admin.timeclocks') ?>" class="btn btn--ghost btn--sm"><?= __('timeclock_timeclocks') ?></a>
     </div>
 </div>
 <?php endif; ?>
@@ -66,12 +66,12 @@ ob_start();
 
 <?php if ($isActive): ?>
     <p class="timeclock-status timeclock-status--active">
-        <?= __('clocked_in_since') ?> <strong><?= htmlspecialchars(substr($clockInTime, 11, 5)) ?></strong>
+        <?= __('timeclock_clocked_in_since') ?> <strong><?= htmlspecialchars(substr($clockInTime, 11, 5)) ?></strong>
         &nbsp;·&nbsp; <span id="timeclock-elapsed"></span>
     </p>
-    <?= Button::make(__('clock_out'))->danger()->lg()->attrs(['id' => 'btn-clockout'])->render() ?>
+    <?= Button::make(__('timeclock_clock_out'))->danger()->lg()->attrs(['id' => 'btn-clockout'])->render() ?>
 <?php else: ?>
-    <p class="timeclock-status timeclock-status--idle"><?= __('not_clocked_in') ?></p>
+    <p class="timeclock-status timeclock-status--idle"><?= __('timeclock_not_clocked_in') ?></p>
     <?php if (count($stores ?? []) > 1): ?>
         <div class="form-group timeclock-store">
             <label class="form-label" for="timeclock-store"><?= __('timeclock_store') ?></label>
@@ -82,7 +82,7 @@ ob_start();
             </select>
         </div>
     <?php endif; ?>
-    <?= Button::make(__('clock_in'))->success()->lg()->attrs(['id' => 'btn-clockin'])->render() ?>
+    <?= Button::make(__('timeclock_clock_in'))->success()->lg()->attrs(['id' => 'btn-clockin'])->render() ?>
 <?php endif; ?>
 <div id="timeclock-message" class="alert mt-sm hidden"></div>
 <?php echo Card::make()->body(ob_get_clean())->render(); ?>
@@ -93,9 +93,9 @@ ob_start();
 ?>
 <?= Table::make()
     ->data($today_entries)
-    ->column(__('clock_in'), fn($e) => htmlspecialchars(substr($e['clock_in_time'] ?? '', 11, 5)))
-    ->column(__('clock_out'), fn($e) => $e['clock_out_time'] ? htmlspecialchars(substr($e['clock_out_time'], 11, 5)) : '—')
-    ->column(__('duration'), fn($e) => ($e['duration_minutes'] !== null && $e['duration_minutes'] !== '')
+    ->column(__('timeclock_clock_in'), fn($e) => htmlspecialchars(substr($e['clock_in_time'] ?? '', 11, 5)))
+    ->column(__('timeclock_clock_out'), fn($e) => $e['clock_out_time'] ? htmlspecialchars(substr($e['clock_out_time'], 11, 5)) : '—')
+    ->column(__('timeclock_duration'), fn($e) => ($e['duration_minutes'] !== null && $e['duration_minutes'] !== '')
         ? floor((int)$e['duration_minutes'] / 60) . 'h' . str_pad((string)((int)$e['duration_minutes'] % 60), 2, '0', STR_PAD_LEFT)
         : '—')
     ->render() ?>
@@ -106,19 +106,19 @@ endif; ?>
 <?php
 ob_start();
 if (empty($week_entries)):
-    echo '<p class="empty-state empty-state--timeclock">' . __('no_timeclock_entries') . '</p>';
+    echo '<p class="empty-state empty-state--timeclock">' . __('timeclock_no_entries') . '</p>';
 else: ?>
 <?= Table::make()
     ->data($week_entries)
     ->column(__('date'), fn($e) => htmlspecialchars($e['shift_date'] ?? ''))
-    ->column(__('clock_in'), fn($e) => htmlspecialchars(substr($e['clock_in_time'] ?? '', 11, 5)))
-    ->column(__('clock_out'), fn($e) => $e['clock_out_time'] ? htmlspecialchars(substr($e['clock_out_time'], 11, 5)) : '—')
-    ->column(__('duration'), fn($e) => ($e['duration_minutes'] !== null && $e['duration_minutes'] !== '')
+    ->column(__('timeclock_clock_in'), fn($e) => htmlspecialchars(substr($e['clock_in_time'] ?? '', 11, 5)))
+    ->column(__('timeclock_clock_out'), fn($e) => $e['clock_out_time'] ? htmlspecialchars(substr($e['clock_out_time'], 11, 5)) : '—')
+    ->column(__('timeclock_duration'), fn($e) => ($e['duration_minutes'] !== null && $e['duration_minutes'] !== '')
         ? floor((int)$e['duration_minutes'] / 60) . 'h' . str_pad((string)((int)$e['duration_minutes'] % 60), 2, '0', STR_PAD_LEFT)
         : '—')
     ->render() ?>
 <?php endif;
-echo Card::make()->header(__('this_week'))->body(ob_get_clean())->render();
+echo Card::make()->header(__('timeclock_this_week'))->body(ob_get_clean())->render();
 ?>
 
 <?php if ($timeclockJs = bundle_asset('timeclock', 'js/timeclock.js')): ?>

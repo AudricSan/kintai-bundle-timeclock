@@ -66,7 +66,7 @@ final class AdminTimeclockController
         $entries    = array_slice($entries, ($page - 1) * self::PER_PAGE, self::PER_PAGE);
 
         return Response::html($this->view->render('timeclock::timeclocks', [
-            'title'           => __('timeclocks'),
+            'title'           => __('timeclock_timeclocks'),
             'entries'         => $entries,
             'users_map'       => $usersMap,
             'stores_map'      => $storesMap,
@@ -84,7 +84,7 @@ final class AdminTimeclockController
 
         $entry = $this->timeclocks->findById($id);
         if ($entry === null) {
-            throw new NotFoundException(__('error_timeclock_entry_not_found'));
+            throw new NotFoundException(__('timeclock_error_entry_not_found'));
         }
         $this->assertStoreAccess($request, (int) ($entry['store_id'] ?? 0));
 
@@ -119,7 +119,7 @@ final class AdminTimeclockController
 
         $entry = $this->timeclocks->findById($id);
         if ($entry === null) {
-            throw new NotFoundException(__('error_timeclock_entry_not_found'));
+            throw new NotFoundException(__('timeclock_error_entry_not_found'));
         }
 
         $storeId = (int) ($entry['store_id'] ?? 0);

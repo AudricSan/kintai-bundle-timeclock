@@ -30,7 +30,7 @@ final class ContractDeclarationsTest extends TestCase
 
         $this->assertCount(1, $items);
         $this->assertInstanceOf(NavItem::class, $items[0]);
-        $this->assertSame(['timeclocks', NavItem::PLANNING, 'timeclocks', 'admin.timeclocks', 'employee.timeclock', 'clock', 'timeclock'],
+        $this->assertSame(['timeclocks', NavItem::PLANNING, 'timeclock_timeclocks', 'admin.timeclocks', 'employee.timeclock', 'clock', 'timeclock'],
             [$items[0]->key, $items[0]->section, $items[0]->label, $items[0]->managerRoute, $items[0]->employeeRoute, $items[0]->icon, $items[0]->employeeLabel]);
         $this->assertSame(['/admin/timeclocks', '/employee/timeclock'], $items[0]->activePaths);
         $this->assertSame('timeclock', $items[0]->storeFeature);
@@ -49,7 +49,7 @@ final class ContractDeclarationsTest extends TestCase
 
         $this->assertCount(1, $features);
         $this->assertInstanceOf(StoreFeature::class, $features[0]);
-        $this->assertSame(['timeclock', 'feature_timeclock', 'feature_timeclock_desc', '🕐', 20],
+        $this->assertSame(['timeclock', 'timeclock_feature_timeclock', 'timeclock_feature_desc', '🕐', 20],
             [$features[0]->key, $features[0]->label, $features[0]->description, $features[0]->icon, $features[0]->order]);
     }
 
@@ -69,7 +69,7 @@ final class ContractDeclarationsTest extends TestCase
         $this->assertCount(2, $widgets);
         [$manager, $employee] = $widgets;
         $this->assertInstanceOf(DashboardWidget::class, $manager);
-        $this->assertSame(['timeclocks_today', DashboardWidget::MANAGER, 'widget_timeclocks_today', 'timeclock::widgets.dashboard-manager', 'timeclock.view', 'timeclock'],
+        $this->assertSame(['timeclocks_today', DashboardWidget::MANAGER, 'timeclock_widget_timeclocks_today', 'timeclock::widgets.dashboard-manager', 'timeclock.view', 'timeclock'],
             [$manager->key, $manager->audience, $manager->label, $manager->view, $manager->permission, $manager->storeFeature]);
         $this->assertSame(['timeclock', DashboardWidget::EMPLOYEE, 'timeclock', 'timeclock::widgets.dashboard-employee', null, 'timeclock'],
             [$employee->key, $employee->audience, $employee->label, $employee->view, $employee->permission, $employee->storeFeature]);
@@ -99,9 +99,9 @@ final class ContractDeclarationsTest extends TestCase
     /** Libellés des déclarations, du journal d'activité et des widgets, fournis par le bundle. */
     public function testDeclaredLabelsAreTranslatedByTheBundle(): void
     {
-        $keys = ['timeclocks', 'timeclock', 'perm_category_timeclock', 'feature_timeclock', 'feature_timeclock_desc',
-            'widget_timeclocks_today', 'no_active_timeclock', 'clocked_in', 'clocked_in_since', 'not_clocked_in', 'clock_in',
-            'clock_out', 'audit_timeclock_clock_in', 'audit_timeclock_clock_out', 'audit_timeclock_edited', 'audit_timeclock_deleted'];
+        $keys = ['timeclock_timeclocks', 'timeclock', 'perm_category_timeclock', 'timeclock_feature_timeclock', 'timeclock_feature_desc',
+            'timeclock_widget_timeclocks_today', 'timeclock_no_active_timeclock', 'timeclock_clocked_in', 'timeclock_clocked_in_since', 'timeclock_not_clocked_in', 'timeclock_clock_in',
+            'timeclock_clock_out', 'audit_timeclock_clock_in', 'audit_timeclock_clock_out', 'audit_timeclock_edited', 'audit_timeclock_deleted'];
         foreach (['fr', 'en', 'ja'] as $locale) {
             $lang = json_decode((string) file_get_contents(dirname(__DIR__) . "/lang/{$locale}.json"), true);
             foreach ($keys as $key) {
