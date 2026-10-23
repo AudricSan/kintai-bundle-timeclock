@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace kintai\Bundles\Installed\Timeclock\Controllers\Api;
 
-use kintai\Core\Api\Paginator;
-use kintai\Core\Auth\PermissionService;
-use kintai\Core\Exceptions\ConflictException;
-use kintai\Core\Exceptions\NotFoundException;
-use kintai\Core\Repositories\StoreUserRepositoryInterface;
-use kintai\Core\Repositories\TimeclockRepositoryInterface;
-use kintai\Core\Request;
-use kintai\Core\Response;
-use kintai\Core\Services\AuditLogger;
+use kintai\Contract\Http\Paginator;
+use kintai\Contract\Auth\PermissionService;
+use kintai\Contract\Exceptions\ConflictException;
+use kintai\Contract\Exceptions\NotFoundException;
+use kintai\Contract\Data\StoreUserRepositoryInterface;
+use kintai\Bundles\Installed\Timeclock\Repositories\TimeclockRepositoryInterface;
+use kintai\Contract\Http\Request;
+use kintai\Contract\Http\Response;
+use kintai\Contract\Services\AuditLogger;
 
 /**
  * Régression (audit RBAC du 11/09/2026) : mêmes correctifs que
@@ -47,7 +47,15 @@ final class TimeclockController
             $items = [];
         }
 
-        $items = $this->permissions->restrictToScope($this->authUser($request), 'timeclock.view', $items);
+        // Éléments couverts par la permission, PLUS ceux de l'appelant : un employé sans timeclock.view lit les siens avec
+        // ?user_id=<lui> (règle self de la route). Avant, restrictToScope() vidait toujours sa liste.
+        $authUser  = $this->authUser($request);
+        $authId    = (int) ($authUser['id'] ?? 0);
+        $scopedIds = array_column($this->permissions->restrictToScope($authUser, 'timeclock.view', $items), 'id');
+        $items     = array_values(array_filter(
+            $items,
+            fn(array $i): bool => in_array($i['id'] ?? null, $scopedIds, true) || (int) ($i['user_id'] ?? 0) === $authId,
+        ));
 
         return Response::json(Paginator::paginate($items, $page, $limit));
     }
@@ -66,13 +74,17 @@ final class TimeclockController
         $userId = (int) ($data['user_id'] ?? 0);
 
         if ($this->timeclocks->findActiveByUser($userId) !== null) {
-            throw new ConflictException(__('error_clockin_already_active'));
+            throw new ConflictException(__('timeclock_error_clockin_already_active'));
         }
 
         $storeId = (int) ($data['store_id'] ?? 0);
         if ($storeId === 0) {
             $memberships = $this->storeUsers->findByUser($userId);
             $storeId     = $memberships ? (int) $memberships[0]['store_id'] : 0;
+        }
+        // Audit du 03/10/2026 : le store_id du corps n'était jamais comparé aux magasins de l'employé.
+        if ($storeId > 0 && $this->storeUsers->findMembership($storeId, $userId) === null) {
+            throw new \kintai\Contract\Exceptions\ForbiddenException(__('error_access_denied'));
         }
 
         $now    = date('Y-m-d H:i:s');
@@ -98,7 +110,7 @@ final class TimeclockController
 
         $active = $this->timeclocks->findActiveByUser($userId);
         if ($active === null) {
-            throw new NotFoundException(__('error_no_active_clockin'));
+            throw new NotFoundException(__('timeclock_error_no_active_clockin'));
         }
 
         $now          = date('Y-m-d H:i:s');
@@ -121,7 +133,10 @@ final class TimeclockController
         $old = $this->requireTimeclock($request, 'timeclock.update');
         $id  = (int) $old['id'];
 
-        $data   = array_merge($request->json() ?? [], ['id' => $id, 'updated_at' => date('Y-m-d H:i:s')]);
+        // Audit du 03/10/2026 : l'employé et le magasin du pointage ne changent pas (déplacer l'entrée vers un magasin tiers contournait requireTimeclock()).
+        $body = $request->json() ?? [];
+        unset($body['user_id'], $body['store_id'], $body['created_at']);
+        $data   = array_merge($body, ['id' => $id, 'updated_at' => date('Y-m-d H:i:s')]);
         $record = $this->timeclocks->save($data);
 
         if (!empty($data['clock_in_time']) && !empty($data['clock_out_time'])) {
@@ -131,7 +146,7 @@ final class TimeclockController
             $record   = $this->timeclocks->save(array_merge($record, ['duration_minutes' => $duration]));
         }
 
-        $this->auditLogger->logUpdate($request, 'timeclock.updated', 'timeclock', resourceId: $id, oldData: $old, newData: $record, extraContext: $request->json() ?? [], storeId: isset($data['store_id']) ? (int) $data['store_id'] : null);
+        $this->auditLogger->logUpdate($request, 'timeclock.updated', 'timeclock', resourceId: $id, oldData: $old, newData: $record, extraContext: $body, storeId: (int) ($old['store_id'] ?? 0) ?: null);
         return Response::json($record);
     }
 
@@ -158,7 +173,7 @@ final class TimeclockController
             fn(int $id) => $this->timeclocks->findById($id),
             (int) $request->param('id'),
             $permissionKey,
-            notFoundMessage: __('error_timeclock_entry_not_found'),
+            notFoundMessage: __('timeclock_error_entry_not_found'),
         );
     }
 }

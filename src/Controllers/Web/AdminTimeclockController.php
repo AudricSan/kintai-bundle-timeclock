@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace kintai\Bundles\Installed\Timeclock\Controllers\Web;
 
-use kintai\Core\Exceptions\NotFoundException;
-use kintai\Core\Repositories\StoreRepositoryInterface;
-use kintai\Core\Repositories\TimeclockRepositoryInterface;
-use kintai\Core\Repositories\UserRepositoryInterface;
-use kintai\Core\Request;
-use kintai\Core\Response;
-use kintai\Core\Services\AuditLogger;
-use kintai\UI\Controller\Web\HasAdminAccess;
-use kintai\UI\ViewRenderer;
+use kintai\Contract\Exceptions\NotFoundException;
+use kintai\Contract\Data\StoreRepositoryInterface;
+use kintai\Bundles\Installed\Timeclock\Repositories\TimeclockRepositoryInterface;
+use kintai\Contract\Data\UserRepositoryInterface;
+use kintai\Contract\Http\Request;
+use kintai\Contract\Http\Response;
+use kintai\Contract\Services\AuditLogger;
+use kintai\Contract\Http\Concerns\HasAdminAccess;
+use kintai\Contract\View\ViewRenderer;
 
 /**
  * Régression (audit RBAC du 11/09/2026) : timeclocksEdit()/timeclocksDelete()
@@ -66,7 +66,7 @@ final class AdminTimeclockController
         $entries    = array_slice($entries, ($page - 1) * self::PER_PAGE, self::PER_PAGE);
 
         return Response::html($this->view->render('timeclock::timeclocks', [
-            'title'           => __('timeclocks'),
+            'title'           => __('timeclock_timeclocks'),
             'entries'         => $entries,
             'users_map'       => $usersMap,
             'stores_map'      => $storesMap,
@@ -84,7 +84,7 @@ final class AdminTimeclockController
 
         $entry = $this->timeclocks->findById($id);
         if ($entry === null) {
-            throw new NotFoundException(__('error_timeclock_entry_not_found'));
+            throw new NotFoundException(__('timeclock_error_entry_not_found'));
         }
         $this->assertStoreAccess($request, (int) ($entry['store_id'] ?? 0));
 
@@ -119,7 +119,7 @@ final class AdminTimeclockController
 
         $entry = $this->timeclocks->findById($id);
         if ($entry === null) {
-            throw new NotFoundException(__('error_timeclock_entry_not_found'));
+            throw new NotFoundException(__('timeclock_error_entry_not_found'));
         }
 
         $storeId = (int) ($entry['store_id'] ?? 0);

@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace kintai\Bundles\Installed\Timeclock\Controllers\Web;
 
-use kintai\Core\Exceptions\ConflictException;
-use kintai\Core\Exceptions\NotFoundException;
-use kintai\Core\Repositories\StoreRepositoryInterface;
-use kintai\Core\Repositories\StoreUserRepositoryInterface;
-use kintai\Core\Repositories\TimeclockRepositoryInterface;
-use kintai\Core\Request;
-use kintai\Core\Response;
-use kintai\Core\Services\AuditLogger;
-use kintai\UI\Controller\Web\HasBaseUrl;
-use kintai\UI\Controller\Web\HasStoreFeatureCheck;
-use kintai\UI\ViewRenderer;
+use kintai\Contract\Exceptions\ConflictException;
+use kintai\Contract\Exceptions\NotFoundException;
+use kintai\Contract\Exceptions\ValidationException;
+use kintai\Contract\Data\StoreRepositoryInterface;
+use kintai\Contract\Data\StoreUserRepositoryInterface;
+use kintai\Bundles\Installed\Timeclock\Repositories\TimeclockRepositoryInterface;
+use kintai\Contract\Http\Request;
+use kintai\Contract\Http\Response;
+use kintai\Contract\Services\AuditLogger;
+use kintai\Contract\Http\Concerns\HasBaseUrl;
+use kintai\Contract\Http\Concerns\HasStoreFeatureCheck;
+use kintai\Contract\View\ViewRenderer;
 
 final class EmployeeTimeclockController
 {
@@ -50,8 +51,15 @@ final class EmployeeTimeclockController
         );
         usort($weekEntries, fn($a, $b) => strcmp($b['shift_date'] ?? '', $a['shift_date'] ?? ''));
 
-        $memberships = $this->storeUsers->findByUser($userId);
-        $storeId     = $memberships ? (int) $memberships[0]['store_id'] : 0;
+        $storeIds = $this->memberStoreIds($userId);
+        $storeId  = $storeIds[0] ?? 0;
+        $stores   = [];
+        foreach ($storeIds as $sid) {
+            $store = $this->stores->findById($sid);
+            if ($store !== null) {
+                $stores[] = ['id' => $sid, 'name' => $store['name'] ?? ('#' . $sid)];
+            }
+        }
 
         return Response::html($this->view->render('timeclock::employee-timeclock', [
             'title'         => __('timeclock'),
@@ -60,6 +68,7 @@ final class EmployeeTimeclockController
             'today_entries' => $todayEntries,
             'week_entries'  => array_values($weekEntries),
             'store_id'      => $storeId,
+            'stores'        => $stores,
         ], 'layout.app'));
     }
 
@@ -79,8 +88,7 @@ final class EmployeeTimeclockController
             throw new ConflictException(__('timeclock_already_active'));
         }
 
-        $memberships = $this->storeUsers->findByUser($userId);
-        $storeId     = $memberships ? (int) $memberships[0]['store_id'] : 0;
+        $storeId = $this->resolveStoreId($request->input('store_id'), $userId);
 
         $now       = date('Y-m-d H:i:s');
         $effective = $this->resolveClientTime($request->input('client_time'), $now);
@@ -146,6 +154,38 @@ final class EmployeeTimeclockController
         $storeId = isset($active['store_id']) ? (int) $active['store_id'] : null;
         $this->auditLogger->logUpdate($request, 'timeclock.clock_out', 'timeclock', (int) ($record['id'] ?? 0) ?: null, $active, $record, $context, $storeId);
         return Response::json($record);
+    }
+
+    /** @return int[] Magasins dont l'employé est membre (le premier sert de défaut). */
+    private function memberStoreIds(int $userId): array
+    {
+        return array_values(array_unique(array_map(
+            fn(array $m): int => (int) $m['store_id'],
+            $this->storeUsers->findByUser($userId)
+        )));
+    }
+
+    /**
+     * Magasin du pointage : celui choisi par l'employé, à condition qu'il en soit membre. Sans
+     * choix (ancien client, file hors-ligne), on retombe sur son premier magasin. Un employé
+     * sans magasin ne peut pas pointer (avant, la ligne était créée avec store_id = 0).
+     *
+     * @throws ValidationException
+     */
+    private function resolveStoreId(mixed $requested, int $userId): int
+    {
+        $storeIds = $this->memberStoreIds($userId);
+        if ($storeIds === []) {
+            throw new ValidationException(['store_id' => __('timeclock_error_no_store')]);
+        }
+        $requested = is_numeric($requested) ? (int) $requested : 0;
+        if ($requested <= 0) {
+            return $storeIds[0];
+        }
+        if (!in_array($requested, $storeIds, true)) {
+            throw new ValidationException(['store_id' => __('timeclock_error_store_not_member')]);
+        }
+        return $requested;
     }
 
     /**
